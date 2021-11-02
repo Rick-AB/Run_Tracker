@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/setupFragment">
+
+    <action
+        android:id="@+id/action_global_tracking_fragment"
+        app:destination="@id/runFragment"
+        app:launchSingleTop="true" />
+
+    <fragment
+        android:id="@+id/setupFragment"
+        android:name="com.example.runningtracker.ui.SetupFragment"
+        android:label="fragment_setup"
+        tools:layout="@layout/fragment_setup" />
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.runningtracker.ui.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_runFragment"
+            app:destination="@id/runFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/runFragment"
+        android:name="com.example.runningtracker.ui.RunFragment"
+        android:label="fragment_run"
+        tools:layout="@layout/fragment_run" />
+</navigation>

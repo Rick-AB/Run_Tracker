@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/runs"
+        android:title="@string/runs_text"
+        android:icon="@drawable/ic_baseline_directions_run"
+        app:showAsAction="always"
+        android:enabled="true" />
+
+    <item android:id="@+id/stats"
+        android:title="@string/statistics_text"
+        android:icon="@drawable/ic_baseline_show_chart"
+        app:showAsAction="always"
+        android:enabled="true" />
+
+    <item android:id="@+id/settings"
+        android:title="@string/settings_text"
+        android:icon="@drawable/ic_baseline_settings"
+        app:showAsAction="always"
+        android:enabled="true" />
+</menu>
