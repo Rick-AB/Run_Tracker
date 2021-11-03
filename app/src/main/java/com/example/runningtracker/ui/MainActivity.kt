@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback {
 
     private fun navigateToRunFragmentWithNotification(intent: Intent?) {
         if (intent?.action == ACTION_SHOW_TRACKING_FRAGMENT) {
-            navHostFragment.findNavController().navigate(R.id.action_global_tracking_fragment)
+            navHostFragment.navController.navigate(R.id.runFragment)
         }
     }
 

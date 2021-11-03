@@ -16,6 +16,6 @@ class MainActivityViewModel
     private val dataStoreManager: DataStoreManager
 ) : ViewModel() {
 
-     suspend fun checkUser(): Flow<User> = dataStoreManager.readUserData()
+     fun checkUser(): Flow<User> = dataStoreManager.readUserData()
 
 }

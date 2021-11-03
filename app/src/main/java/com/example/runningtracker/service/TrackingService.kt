@@ -29,19 +29,40 @@ import com.example.runningtracker.utils.Constants.LOCATION_UPDATE_INTERVAL
 import com.example.runningtracker.utils.Constants.NOTIFICATION_CHANNEL_ID
 import com.example.runningtracker.utils.Constants.NOTIFICATION_CHANNEL_NAME
 import com.example.runningtracker.utils.Constants.NOTIFICATION_ID
+import com.example.runningtracker.utils.StopWatchOrchestrator
 import com.example.runningtracker.utils.TimestampMillisecondsFormatter
 import com.google.android.gms.location.*
 import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
 import com.google.android.gms.maps.model.LatLng
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 typealias Polyline = MutableList<LatLng>
 typealias Polylines = MutableList<Polyline>
 
+@AndroidEntryPoint
 class TrackingService : LifecycleService() {
 
     private var isFirstRun = true
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private var isServiceStopped = false
+    private lateinit var currentNotificationBuilder: NotificationCompat.Builder
+
+    @Inject
+    lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+
+    @Inject
+    lateinit var baseNotificationBuilder: NotificationCompat.Builder
+
+    @Inject
+    lateinit var stopWatchOrchestrator: StopWatchOrchestrator
 
     companion object {
         val isTracking = MutableLiveData<Boolean>()
@@ -56,10 +77,12 @@ class TrackingService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
         postInitialValues()
+        currentNotificationBuilder = baseNotificationBuilder
         fusedLocationProviderClient = FusedLocationProviderClient(this)
 
         isTracking.observe(this) {
             updateLocationTracking(it)
+            updateNotification(it)
         }
     }
 
@@ -78,7 +101,7 @@ class TrackingService : LifecycleService() {
                     pauseService()
                 }
                 ACTION_STOP_SERVICE -> {
-                    Log.d("TAG", "onStartCommand: ")
+                    stopService()
                 }
                 else -> Log.d("TAG", "onStartCommand: ")
             }
@@ -88,6 +111,17 @@ class TrackingService : LifecycleService() {
 
     private fun pauseService() {
         isTracking.postValue(false)
+        stopWatchOrchestrator.pause()
+    }
+
+    private fun stopService() {
+        isServiceStopped = true
+        isFirstRun = true
+        pauseService()
+        stopWatchOrchestrator.stop()
+        postInitialValues()
+        stopForeground(true)
+        stopSelf()
     }
 
     private fun updateLocationTracking(isTracking: Boolean) {
@@ -147,10 +181,43 @@ class TrackingService : LifecycleService() {
         pathPoints.postValue(this)
     } ?: pathPoints.postValue(mutableListOf(mutableListOf()))
 
+
+    private fun updateNotification(isTracking: Boolean) {
+        Log.d("TAG", "updateNotification: $isTracking")
+        val notificationActionText = if (isTracking) "Pause" else "Resume"
+        val pendingIntent = if (isTracking) {
+            val pauseIntent = Intent(this, TrackingService::class.java).apply {
+                action = ACTION_PAUSE_SERVICE
+            }
+            PendingIntent.getService(this, 1, pauseIntent, FLAG_UPDATE_CURRENT)
+        } else {
+            val resumeIntent = Intent(this, TrackingService::class.java).apply {
+                action = ACTION_START_OR_RESUME_SERVICE
+            }
+            PendingIntent.getService(this, 2, resumeIntent, FLAG_UPDATE_CURRENT)
+        }
+
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+
+        currentNotificationBuilder.javaClass.getDeclaredField("mActions").apply {
+            isAccessible = true
+            set(currentNotificationBuilder, ArrayList<NotificationCompat.Action>())
+        }
+
+        if (!isServiceStopped) {
+            currentNotificationBuilder = baseNotificationBuilder.addAction(
+                R.drawable.ic_baseline_pause_24, notificationActionText, pendingIntent
+            )
+
+            notificationManager.notify(NOTIFICATION_ID, currentNotificationBuilder.build())
+        }
+    }
+
     @SuppressLint("ObsoleteSdkInt")
     private fun startForegroundService() {
         addEmptyPolyline()
         isTracking.postValue(true)
+        stopWatchOrchestrator.start()
 
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -159,25 +226,20 @@ class TrackingService : LifecycleService() {
             createNotificationChannel(notificationManager)
         }
 
-        val notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_baseline_directions_run)
-            .setContentTitle("Running App")
-            .setContentText(TimestampMillisecondsFormatter.DEFAULT_TIME)
-            .setContentIntent(getMainActivityPendingIntent())
-            .setAutoCancel(false)
-            .setOngoing(true)
+        startForeground(NOTIFICATION_ID, baseNotificationBuilder.build())
 
-        startForeground(NOTIFICATION_ID, notificationBuilder.build())
+        CoroutineScope(Dispatchers.IO).launch {
+            stopWatchOrchestrator.ticker.collect {
+                if (!isServiceStopped) {
+                    val notification = currentNotificationBuilder
+                        .setContentText(it.substring(0, it.lastIndexOf(':')))
+                    notificationManager.notify(NOTIFICATION_ID, notification.build())
+                    delay(1000)
+                }
+            }
+        }
+
     }
-
-    private fun getMainActivityPendingIntent() = PendingIntent.getActivity(
-        this,
-        0,
-        Intent(this, MainActivity::class.java).also {
-            it.action = ACTION_SHOW_TRACKING_FRAGMENT
-        },
-        FLAG_UPDATE_CURRENT
-    )
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(notificationManager: NotificationManager) {

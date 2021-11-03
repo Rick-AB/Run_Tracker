@@ -3,6 +3,7 @@ package com.example.runningtracker.utils
 import com.example.runningtracker.di.DefaultDispatcher
 import kotlinx.coroutines.*
 import kotlinx.coroutines.NonCancellable.isActive
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -29,6 +30,8 @@ class StopWatchOrchestrator
             }
         }
     }
+
+    fun getElapsedTime() = stopWatchStateHolder.getElapsedTime()
 
     fun pause() {
         stopWatchStateHolder.pause()

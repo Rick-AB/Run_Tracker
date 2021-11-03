@@ -23,6 +23,14 @@ class StopWatchStateHolder
         currentState = StopWatchState.Paused(0)
     }
 
+    fun getElapsedTime(): Long {
+        val elapsedTime = when (val currentState = currentState) {
+            is StopWatchState.Paused -> currentState.elapsedTime
+            is StopWatchState.Running -> elapsedTimeCalculator.calculate(currentState)
+        }
+        return elapsedTime
+    }
+
     fun getStringTimeRepresentation(): String {
         val elapsedTime = when (val currentState = currentState) {
             is StopWatchState.Paused -> currentState.elapsedTime
