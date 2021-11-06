@@ -14,4 +14,13 @@
     <string name="finish_run_text">Finish Run</string>
     <string name="initial_timer">00:00:00</string>
     <string name="pause_text">Pause</string>
+    <string name="cancel_run">Cancel Run</string>
+
+    <string-array name="sort_items">
+        <item>Date</item>
+        <item>Distance</item>
+        <item>Time</item>
+        <item>Calories</item>
+        <item>Avg Speed</item>
+    </string-array>
 </resources>

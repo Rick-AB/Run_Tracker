@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.MainActivity">
@@ -24,6 +25,7 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
         style="@style/Widget.MaterialComponents.BottomNavigationView.Colored"
+        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         app:itemIconTint="@color/bottom_nav_foreground"
         app:itemTextColor="@color/bottom_nav_foreground"
         app:menu="@menu/bottom_tab_menu"

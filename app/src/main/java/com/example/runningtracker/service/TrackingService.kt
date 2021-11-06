@@ -51,7 +51,6 @@ typealias Polylines = MutableList<Polyline>
 @AndroidEntryPoint
 class TrackingService : LifecycleService() {
 
-    private var isFirstRun = true
     private var isServiceStopped = false
     private lateinit var currentNotificationBuilder: NotificationCompat.Builder
 
@@ -65,6 +64,9 @@ class TrackingService : LifecycleService() {
     lateinit var stopWatchOrchestrator: StopWatchOrchestrator
 
     companion object {
+        var isFirstRun = true
+        private set
+
         val isTracking = MutableLiveData<Boolean>()
         val pathPoints = MutableLiveData<Polylines>()
     }
@@ -94,6 +96,7 @@ class TrackingService : LifecycleService() {
                         startForegroundService()
                         isFirstRun = false
                     } else {
+                        stopWatchOrchestrator.start()
                         startForegroundService()
                     }
                 }
@@ -183,7 +186,6 @@ class TrackingService : LifecycleService() {
 
 
     private fun updateNotification(isTracking: Boolean) {
-        Log.d("TAG", "updateNotification: $isTracking")
         val notificationActionText = if (isTracking) "Pause" else "Resume"
         val pendingIntent = if (isTracking) {
             val pauseIntent = Intent(this, TrackingService::class.java).apply {

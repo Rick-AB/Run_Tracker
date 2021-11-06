@@ -6,6 +6,7 @@
         <entry key="app/src/main/res/drawable/bottom_dialog_icon.xml" value="0.3260416666666667" />
         <entry key="app/src/main/res/drawable/bottom_dialog_shape.xml" value="0.3260416666666667" />
         <entry key="app/src/main/res/drawable/bottom_nav_bar_foreground.xml" value="0.3260416666666667" />
+        <entry key="app/src/main/res/drawable/ic_baseline_delete_24.xml" value="0.3260416666666667" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25407608695652173" />
         <entry key="app/src/main/res/layout/fragment_bottom_dialog.xml" value="0.2513586956521739" />
         <entry key="app/src/main/res/layout/fragment_bottom_sheet.xml" value="0.2513586956521739" />
@@ -14,6 +15,7 @@
         <entry key="app/src/main/res/layout/fragment_setup.xml" value="0.25407608695652173" />
         <entry key="app/src/main/res/layout/recycler_view_item.xml" value="0.2513586956521739" />
         <entry key="app/src/main/res/menu/bottom_tab_menu.xml" value="0.3098958333333333" />
+        <entry key="app/src/main/res/menu/run_fragment_menu.xml" value="0.3098958333333333" />
       </map>
     </option>
   </component>

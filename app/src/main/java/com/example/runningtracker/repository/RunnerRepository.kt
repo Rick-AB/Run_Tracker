@@ -13,4 +13,19 @@ constructor(
     suspend fun insertRun(runEntry: RunEntry) {
         runnerDao.insertRun(runEntry)
     }
+
+    suspend fun deleteRun(runEntry: RunEntry) {
+        runnerDao.deleteRun(runEntry)
+    }
+
+    fun getRunsSortedByDate() = runnerDao.getAllRunsSortedByDate()
+
+    fun getRunSortedByDistance() = runnerDao.getAllRunsSortedByDistance()
+
+    fun getRunSortedByTime() = runnerDao.getAllRunsSortedByTotalTime()
+
+    fun getRunSortedByAvgSpeed() = runnerDao.getAllRunsSortedBySpeed()
+
+    fun getRunSortedByCaloriesBurned() = runnerDao.getAllRunsSortedByCaloriesBurned()
+
 }

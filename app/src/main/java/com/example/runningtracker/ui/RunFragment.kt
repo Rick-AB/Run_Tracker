@@ -2,13 +2,13 @@ package com.example.runningtracker.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.example.runningtracker.R
 import com.example.runningtracker.databinding.FragmentRunBinding
 import com.example.runningtracker.model.RunEntry
@@ -28,12 +28,13 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.maps.android.geometry.Bounds
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
-import java.sql.Timestamp
-import java.time.LocalDateTime
+import kotlinx.coroutines.launch
 import java.util.*
+import kotlin.math.log
 import kotlin.math.round
 
 @AndroidEntryPoint
@@ -41,6 +42,7 @@ class RunFragment : Fragment() {
     private lateinit var runBinding: FragmentRunBinding
     private lateinit var googleMap: GoogleMap
     private lateinit var user: User
+    private var menu: Menu? = null
     private val runFragmentViewModel by viewModels<RunFragmentViewModel>()
 
     private var isTracking = false
@@ -56,9 +58,11 @@ class RunFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
             runFragmentViewModel.getUser().collect {
                 user = it
+                Log.d("TAG", "onCreateView: $it")
             }
         }
 
+        setHasOptionsMenu(true)
         setListeners()
         return runBinding.root
     }
@@ -71,6 +75,7 @@ class RunFragment : Fragment() {
     private fun setListeners() {
 
         runBinding.stopWatchStartBtn.setOnClickListener {
+            showMenu()
             toggleRun()
         }
 
@@ -83,21 +88,45 @@ class RunFragment : Fragment() {
         }
     }
 
+    private fun cancelRun() {
+        val alertDialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Cancel Run")
+            .setMessage("You will lose the data of this run if you chose to cancel. Are you sure?")
+            .setIcon(R.drawable.ic_baseline_delete_24)
+            .setPositiveButton("Yes") { _, _ ->
+                sendCommandToService(ACTION_STOP_SERVICE)
+                googleMap.clear()
+                showSnackBar("Run cancelled!")
+                findNavController().popBackStack()
+            }
+            .setNegativeButton("No") {dialogInterface,_ ->
+                dialogInterface.cancel()
+            }
+            .create()
+
+        alertDialog.show()
+    }
+
+    private fun showSnackBar(message: String) {
+        Snackbar.make(
+            requireActivity().findViewById(R.id.root), message, Snackbar.LENGTH_LONG
+        ).show()
+    }
+
     private fun finishRun() {
         zoomCameraToPointsBounds()
         takeSnapshotAndSave()
-        sendCommandToService(ACTION_STOP_SERVICE)
     }
 
     private fun resumeRun() {
         sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
-        runFragmentViewModel.resumeRun()
     }
 
     private fun toggleRun() {
         if (!isTracking) {
             sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
         } else {
+            Log.d("TAG", "toggleRun: ${runFragmentViewModel.getElapsedTime()}")
             sendCommandToService(ACTION_PAUSE_SERVICE)
         }
     }
@@ -158,33 +187,36 @@ class RunFragment : Fragment() {
 
     private fun takeSnapshotAndSave() {
         googleMap.snapshot { bitmap ->
-
-            var distanceInMeters = 0
-            val currentTimeInMillis = runFragmentViewModel.getElapsedTime()
-            val avgSpeed = round ((distanceInMeters / 1000f) / (currentTimeInMillis) * 10) / 10f
-            val dateTimeStamp = Calendar.getInstance().timeInMillis
-            val caloriesBurned = ((distanceInMeters / 1000f) * user.weight).toInt()
-
-            for (polyline in pathPoints) {
-                distanceInMeters += runFragmentViewModel.calculateTotalDistanceRan(polyline).toInt()
+            val runEntry = runFragmentViewModel.getRunEntry(bitmap, pathPoints, user.weight)
+            viewLifecycleOwner.lifecycleScope.launch {
+                runFragmentViewModel.saveRun(runEntry)
+                googleMap.clear()
+                sendCommandToService(ACTION_STOP_SERVICE)
+                showSnackBar("Run saved successfully!")
+                findNavController().popBackStack()
             }
-
-            val run = RunEntry(bitmap, dateTimeStamp, currentTimeInMillis, caloriesBurned, distanceInMeters, avgSpeed)
-            runFragmentViewModel.saveRun(run)
         }
     }
 
     private fun updateTracking(isTracking: Boolean) {
         this.isTracking = isTracking
 
-        if (isTracking) {
-            runBinding.stopWatchStartBtn.text = getString(R.string.pause_text)
-            hideButtons()
-            showStartButton()
-        } else {
-            runBinding.stopWatchStartBtn.text = getString(R.string.start_text)
-            showButtons()
-            hideStartButton()
+        when {
+            isTracking -> {
+                runBinding.stopWatchStartBtn.text = getString(R.string.pause_text)
+                hideButtons()
+                showStartButton()
+            }
+            TrackingService.isFirstRun -> {
+                runBinding.stopWatchStartBtn.text = getString(R.string.start_text)
+                hideButtons()
+                showStartButton()
+            }
+            else -> {
+                runBinding.stopWatchStartBtn.text = getString(R.string.start_text)
+                showButtons()
+                hideStartButton()
+            }
         }
     }
 
@@ -225,6 +257,34 @@ class RunFragment : Fragment() {
         }
 
     }
+
+    private fun showMenu() {
+        this.menu?.getItem(0)?.isVisible = true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        Log.d("TAG", "onPrepareOptionsMenu: CALLED")
+        if (runFragmentViewModel.getElapsedTime() > 0L) {
+            Log.d("TAG", "onPrepareOptionsMenu: ${this.menu?.getItem(0)}")
+
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.run_fragment_menu, menu)
+        this.menu = menu
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.cancel_run -> cancelRun()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
