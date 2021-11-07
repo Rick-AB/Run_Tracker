@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingHorizontal="8dp">
+
+
+        <TextView
+            android:id="@+id/stats_total_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Total Time: "
+            style="@style/stats_text_label"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/stats_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            style="@style/stats_text_label"
+            android:text="Total Distance: "
+            app:layout_constraintStart_toStartOf="@+id/stats_total_time"
+            app:layout_constraintTop_toBottomOf="@+id/stats_total_time" />
+
+        <TextView
+            android:id="@+id/stats_calories"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            style="@style/stats_text_label"
+            android:text="Total Calories: "
+            app:layout_constraintStart_toStartOf="@+id/stats_total_time"
+            app:layout_constraintTop_toBottomOf="@+id/stats_distance" />
+
+        <TextView
+            android:id="@+id/stats_avg_speed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            style="@style/stats_text_label"
+            android:text="Average Speed: "
+            app:layout_constraintStart_toStartOf="@+id/stats_calories"
+            app:layout_constraintTop_toBottomOf="@+id/stats_calories" />
+
+        <TextView
+            android:id="@+id/stats_total_time_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/stats_text_value"
+            app:layout_constraintBottom_toBottomOf="@+id/stats_total_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/stats_total_time"
+            tools:text="00:59:34" />
+
+        <TextView
+            android:id="@+id/stats_distance_value"
+            android:layout_width="54dp"
+            android:layout_height="20dp"
+            style="@style/stats_text_value"
+            app:layout_constraintBottom_toBottomOf="@+id/stats_distance"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/stats_distance"
+            tools:text="23km" />
+
+        <TextView
+            android:id="@+id/stats_calories_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/stats_text_value"
+            tools:text="50kcal"
+            app:layout_constraintBottom_toBottomOf="@+id/stats_calories"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/stats_calories" />
+
+        <TextView
+            android:id="@+id/stats_avg_speed_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="120km/h"
+            style="@style/stats_text_value"
+            app:layout_constraintBottom_toBottomOf="@+id/stats_avg_speed"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/stats_avg_speed" />
+
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/bar_chart"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/stats_avg_speed_value" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

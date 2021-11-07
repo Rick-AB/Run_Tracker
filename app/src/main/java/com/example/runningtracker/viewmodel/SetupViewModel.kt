@@ -12,7 +12,7 @@ class SetupViewModel @Inject constructor(
 ) : ViewModel() {
 
     suspend fun storeData(name: String, weight: String) {
-        val user = User(name, weight.toInt())
+        val user = User(name, weight.toDouble())
         dataStore.saveUserData(user)
     }
 
@@ -27,7 +27,7 @@ class SetupViewModel @Inject constructor(
         if (weight.isEmpty() || weight.isBlank()) {
             errorMessage = "Enter your weight"
             return errorMessage
-        } else if (weight.toInt() < 10) {
+        } else if (weight.toDouble() < 10.0) {
             errorMessage = "Enter weight greater than 10Kg"
             return errorMessage
         }

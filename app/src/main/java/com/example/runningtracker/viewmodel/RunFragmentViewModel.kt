@@ -62,7 +62,7 @@ class RunFragmentViewModel
         return df.format(avgSpeedMetersPerSec * 3.6f).toFloat()
     }
 
-    fun getRunEntry(bitmap: Bitmap?, pathPoints: Polylines, weight: Int): RunEntry {
+    fun getRunEntry(bitmap: Bitmap?, pathPoints: Polylines, weight: Double): RunEntry {
         var distanceInMeters = 0
 
         for (polyline in pathPoints) {

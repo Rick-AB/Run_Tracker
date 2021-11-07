@@ -28,4 +28,12 @@ constructor(
 
     fun getRunSortedByCaloriesBurned() = runnerDao.getAllRunsSortedByCaloriesBurned()
 
+    fun getTotalTimeRun() = runnerDao.getTotalTime()
+
+    fun getTotalDistance() = runnerDao.getTotalDistance()
+
+    fun getTotalCaloriesBurned() = runnerDao.getTotalCaloriesBurned()
+
+    fun getAvgSpeed() = runnerDao.getAvgSpeed()
+
 }

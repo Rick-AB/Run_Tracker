@@ -23,10 +23,26 @@
         <action
             android:id="@+id/action_homeFragment_to_runFragment"
             app:destination="@id/runFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_statisticsFragment"
+            app:destination="@id/statisticsFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/runFragment"
         android:name="com.example.runningtracker.ui.RunFragment"
         android:label="fragment_run"
         tools:layout="@layout/fragment_run" />
+    <fragment
+        android:id="@+id/statisticsFragment"
+        android:name="com.example.runningtracker.ui.StatisticsFragment"
+        android:label="StatisticsFragment"
+        tools:layout="@layout/fragment_statistics"/>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.runningtracker.ui.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" />
 </navigation>

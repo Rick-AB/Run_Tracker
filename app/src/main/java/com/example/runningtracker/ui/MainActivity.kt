@@ -15,9 +15,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat.*
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
 import androidx.navigation.NavGraph
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.setupWithNavController
 import com.example.runningtracker.R
 import com.example.runningtracker.databinding.ActivityMainBinding
 import com.example.runningtracker.model.User
@@ -32,6 +35,7 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback {
     private lateinit var navGraph: NavGraph
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var binding: ActivityMainBinding
+    private lateinit var navController: NavController
     private lateinit var user: User
     private val viewModel by viewModels<MainActivityViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,8 +45,12 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback {
 
         navHostFragment =
             (supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment)
-        val inflater = navHostFragment.navController.navInflater
+        navController = navHostFragment.navController
+        val inflater = navController.navInflater
         navGraph = inflater.inflate(R.navigation.nav_graph)
+
+        binding.bottomNav.setupWithNavController(navController)
+        NavigationUI.setupWithNavController(binding.bottomNav, navHostFragment.navController)
 
         lifecycleScope.launchWhenCreated {
             viewModel.checkUser().collect {
@@ -52,27 +60,11 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback {
         }
 
         setDestinationChangeListener()
-        setBottomNavItemListener()
-    }
-
-    private fun setBottomNavItemListener() {
-        binding.bottomNav.setOnItemSelectedListener {
-            when (it.itemId) {
-                R.id.runs -> navigateToFragment(R.id.homeFragment)
-                R.id.stats -> navigateToFragment(R.id.homeFragment)
-                R.id.settings -> navigateToFragment(R.id.homeFragment)
-            }
-            return@setOnItemSelectedListener true
-        }
-    }
-
-    private fun navigateToFragment(id: Int) {
-        navHostFragment.navController.navigate(id)
     }
 
     private fun navigateToRunFragmentWithNotification(intent: Intent?) {
         if (intent?.action == ACTION_SHOW_TRACKING_FRAGMENT) {
-            navHostFragment.navController.navigate(R.id.runFragment)
+            navController.navigate(R.id.runFragment)
         }
     }
 
@@ -84,12 +76,12 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback {
             setAppBarTitle(user.name)
             showBottomNavBar()
         }
-        navHostFragment.navController.graph = navGraph
+        navController.graph = navGraph
         navigateToRunFragmentWithNotification(intent)
     }
 
     private fun setDestinationChangeListener() {
-        navHostFragment.navController.addOnDestinationChangedListener { _, destination, _ ->
+        navController.addOnDestinationChangedListener { _, destination, _ ->
             if (destination.id == R.id.runFragment) {
                 hideBottomNavBar()
             }

@@ -15,6 +15,18 @@
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
     </style>
 
+    <style name="stats_text_label">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="stats_text_value">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textAlignment">viewEnd</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="AppBottomSheetDialogTheme" parent="Theme.Design.BottomSheetDialog" >
         <item name="bottomSheetStyle">@style/AppModalStyle</item>
     </style>

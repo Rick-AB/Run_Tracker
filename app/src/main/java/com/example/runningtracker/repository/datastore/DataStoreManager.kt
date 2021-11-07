@@ -1,8 +1,8 @@
 package com.example.runningtracker.repository.datastore
 
 import android.content.Context
+import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.runningtracker.model.User
@@ -17,7 +17,7 @@ class DataStoreManager @Inject constructor(
 ) {
     companion object {
         val NAME = stringPreferencesKey("User's name")
-        val WEIGHT = intPreferencesKey("User's weight")
+        val WEIGHT = doublePreferencesKey("User's weight")
     }
 
     suspend fun saveUserData(user: User) {
@@ -30,7 +30,7 @@ class DataStoreManager @Inject constructor(
     fun readUserData() = context.userDataStore.data.map {
         User(
             name = it[NAME] ?: "",
-            weight = it[WEIGHT] ?: 0
+            weight = it[WEIGHT] ?: 0.0
         )
     }
 

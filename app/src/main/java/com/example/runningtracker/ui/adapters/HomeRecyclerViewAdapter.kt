@@ -39,8 +39,8 @@ class HomeRecyclerViewAdapter @Inject constructor(
         with(differ.currentList[position]) {
             with(holder.binding) {
 
-                val distance = "${distanceInMeters/1000f}Km"
-                val speed = "${averageSpeedKMH}Km/h"
+                val distance = "${distanceInMeters/1000f}km"
+                val speed = "${averageSpeedKMH}km/h"
                 val calories = "${caloriesBurned}kcal"
                 val formattedTime = timestampMillisecondsFormatter.format(timeInMilliseconds, false)
                 val date = getDateFromTimeStamp(timeStamp)

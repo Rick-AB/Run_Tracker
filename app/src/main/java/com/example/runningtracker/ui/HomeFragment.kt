@@ -10,17 +10,16 @@ import android.widget.ArrayAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.runningtracker.R
 import com.example.runningtracker.databinding.FragmentHomeBinding
 import com.example.runningtracker.ui.adapters.HomeRecyclerViewAdapter
 import com.example.runningtracker.utils.SortTypes
 import com.example.runningtracker.viewmodel.HomeFragmentViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -42,7 +41,7 @@ class HomeFragment : Fragment(), OnItemSelectedListener {
         binding.homeFragmentFab.setOnClickListener { navigate() }
         setupRecyclerView()
         setupSpinner()
-        getAllRuns()
+        subscribeToObserver()
 
         return binding.root
     }
@@ -61,7 +60,7 @@ class HomeFragment : Fragment(), OnItemSelectedListener {
         }
     }
 
-    private fun getAllRuns() {
+    private fun subscribeToObserver() {
         viewLifecycleOwner.lifecycleScope.launch {
             homeViewModel.runs.observe(viewLifecycleOwner) {
                 homeRecyclerViewAdapter.submitList(it)
@@ -75,6 +74,22 @@ class HomeFragment : Fragment(), OnItemSelectedListener {
         binding.homeFragmentRv.adapter = homeRecyclerViewAdapter
         binding.homeFragmentRv.layoutManager = layoutManager
         binding.homeFragmentRv.setHasFixedSize(true)
+
+        binding.homeFragmentRv.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    binding.homeFragmentFab.show()
+                }
+
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 0 || dy < 0 && binding.homeFragmentFab.isShown) {
+                    binding.homeFragmentFab.hide()
+                }
+            }
+        })
     }
 
     private fun navigate() {

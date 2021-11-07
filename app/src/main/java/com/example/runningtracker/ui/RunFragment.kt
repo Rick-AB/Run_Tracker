@@ -11,7 +11,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.runningtracker.R
 import com.example.runningtracker.databinding.FragmentRunBinding
-import com.example.runningtracker.model.RunEntry
 import com.example.runningtracker.model.User
 import com.example.runningtracker.service.Polyline
 import com.example.runningtracker.service.TrackingService
@@ -33,9 +32,6 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import java.util.*
-import kotlin.math.log
-import kotlin.math.round
 
 @AndroidEntryPoint
 class RunFragment : Fragment() {

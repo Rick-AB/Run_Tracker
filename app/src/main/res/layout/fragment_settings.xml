@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingHorizontal="16dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/settings_textInputLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            app:helperTextEnabled="true"
+            app:errorEnabled="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/settings_name_et"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="@string/your_name_text" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/settings_textInputLayout2"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            app:helperTextEnabled="true"
+            app:errorEnabled="true"
+            app:layout_constraintEnd_toEndOf="@id/settings_textInputLayout"
+            app:layout_constraintStart_toStartOf="@id/settings_textInputLayout"
+            app:layout_constraintTop_toBottomOf="@id/settings_textInputLayout"
+            app:suffixText="Kg">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/settings_weight_et"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="@string/weight_text"
+                android:inputType="numberDecimal" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/settings_save_btn"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="30dp"
+            android:text="@string/save_changes_text"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@id/settings_textInputLayout"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/settings_textInputLayout2" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
