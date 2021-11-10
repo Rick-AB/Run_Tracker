@@ -74,6 +74,8 @@ class HomeRecyclerViewAdapter @Inject constructor(
 
     fun submitList(list: List<RunEntry>) = differ.submitList(list)
 
+    fun getRunEntry(pos: Int): RunEntry = differ.currentList[pos]
+
     class HomeRecyclerViewHolder(val binding: RecyclerViewItemBinding) :
         RecyclerView.ViewHolder(binding.root)
 

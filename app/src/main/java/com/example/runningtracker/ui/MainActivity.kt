@@ -12,14 +12,13 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat.*
+import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
+import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.example.runningtracker.R
 import com.example.runningtracker.databinding.ActivityMainBinding
@@ -27,6 +26,7 @@ import com.example.runningtracker.model.User
 import com.example.runningtracker.utils.Constants.ACTION_SHOW_TRACKING_FRAGMENT
 import com.example.runningtracker.utils.Constants.LOCATION_PERMISSION_REQUEST_CODE
 import com.example.runningtracker.viewmodel.MainActivityViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 
@@ -50,7 +50,8 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback {
         navGraph = inflater.inflate(R.navigation.nav_graph)
 
         binding.bottomNav.setupWithNavController(navController)
-        NavigationUI.setupWithNavController(binding.bottomNav, navHostFragment.navController)
+        binding.bottomNav.setupWithNavController(navController)
+        binding.bottomNav.setOnItemReselectedListener { /** NO Operation **/ }
 
         lifecycleScope.launchWhenCreated {
             viewModel.checkUser().collect {
@@ -96,7 +97,6 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback {
 
     private fun showBottomNavBar() {
         binding.bottomNav.visibility = View.VISIBLE
-
     }
 
     private fun hideBottomNavBar() {
@@ -126,7 +126,7 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback {
     }
 
     private fun showAlertDialog() {
-        AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder(this)
             .setTitle("Location Permission Needed")
             .setMessage("This app needs the Location permission, please accept to use location functionality")
             .setPositiveButton(

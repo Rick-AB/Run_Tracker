@@ -3,6 +3,7 @@
     package="com.example.runningtracker">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
@@ -14,7 +15,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.RunningTracker">
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyCIm-rIrI-JObKv9ilQfb5x-BMGAUF8Z80" />
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="@string/GOOGLE_API_KEY" />
 
         <service android:name=".service.TrackingService" android:foregroundServiceType="location" />
 

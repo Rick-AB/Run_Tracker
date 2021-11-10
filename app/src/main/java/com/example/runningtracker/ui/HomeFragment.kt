@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.runningtracker.R
@@ -22,6 +23,9 @@ import com.example.runningtracker.viewmodel.HomeFragmentViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.runningtracker.model.RunEntry
+import com.google.android.material.snackbar.Snackbar
+
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(), OnItemSelectedListener {
@@ -46,7 +50,11 @@ class HomeFragment : Fragment(), OnItemSelectedListener {
         return binding.root
     }
     private fun setupSpinner() {
-        val adapter = ArrayAdapter.createFromResource(requireContext(), R.array.sort_items ,android.R.layout.simple_spinner_item,)
+        val adapter = ArrayAdapter.createFromResource(
+            requireContext(),
+            R.array.sort_items,
+            android.R.layout.simple_spinner_item
+        )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.sortSpinner.adapter = adapter
         binding.sortSpinner.onItemSelectedListener = this
@@ -81,7 +89,7 @@ class HomeFragment : Fragment(), OnItemSelectedListener {
                     binding.homeFragmentFab.show()
                 }
 
-                super.onScrollStateChanged(recyclerView, newState);
+                super.onScrollStateChanged(recyclerView, newState)
             }
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -90,6 +98,38 @@ class HomeFragment : Fragment(), OnItemSelectedListener {
                 }
             }
         })
+
+        val helper = ItemTouchHelper(
+            object : ItemTouchHelper.SimpleCallback(
+                0,
+                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+            ) {
+                // Not needed
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+                ): Boolean {
+                    return false
+                }
+
+                // delete run from db when swiped
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    val position = viewHolder.adapterPosition
+                    val runEntry: RunEntry = homeRecyclerViewAdapter.getRunEntry(position)
+
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        homeViewModel.deleteRun(runEntry)
+                        showSnackBar("Run deleted successful!")
+                    }
+                }
+            })
+
+        helper.attachToRecyclerView(binding.homeFragmentRv)
+    }
+
+    private fun showSnackBar(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
     }
 
     private fun navigate() {
